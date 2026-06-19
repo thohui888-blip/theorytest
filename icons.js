@@ -1,0 +1,118 @@
+// Piano Theory App — hand-drawn notation icon set
+// Single consistent visual language: stroke #1f2430, round caps/joins, filled noteheads.
+// Two icon kinds:
+//   svg  -> raw <svg> markup, viewBox-based, drawn to match standard notation shapes
+//   text -> rendered as a styled dynamic-mark (bold italic), matching how dynamics
+//           are actually typeset in real scores (more accurate than a drawn image)
+const INK = '#1f2430';
+
+// Reusable note template (filled notehead + stem), used by articulation marks
+// that are notated directly above the note. Generous gap between the mark
+// zone (y 4-28) and the stem top (y 35) keeps each mark legible on its own.
+function noteWithMark(markSvg) {
+  return `<svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="60" cy="90" rx="14" ry="10" fill="${INK}"/>
+    <line x1="73" y1="90" x2="73" y2="35" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
+    ${markSvg}
+  </svg>`;
+}
+
+const ICONS = {
+  // ── Articulation marks (drawn above a note) ──
+  staccato: { type: 'svg', svg: noteWithMark(`<circle cx="73" cy="16" r="6" fill="${INK}"/>`) },
+  staccatissimo: { type: 'svg', svg: noteWithMark(`<path d="M73 5 L80 27 L66 27 Z" fill="${INK}"/>`) },
+  accent: { type: 'svg', svg: noteWithMark(`<path d="M53 9 L93 18 L53 27" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`) },
+  marcato: { type: 'svg', svg: noteWithMark(`<path d="M53 28 L73 6 L93 28" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`) },
+  tenuto: { type: 'svg', svg: noteWithMark(`<line x1="55" y1="18" x2="91" y2="18" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>`) },
+  mezzo_staccato: { type: 'svg', svg: noteWithMark(`<line x1="56" y1="8" x2="90" y2="8" stroke="${INK}" stroke-width="6" stroke-linecap="round"/><circle cx="73" cy="24" r="5" fill="${INK}"/>`) },
+  fermata: { type: 'svg', svg: noteWithMark(`<path d="M43 28 A30 24 0 0 1 103 28" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round"/><circle cx="73" cy="22" r="5" fill="${INK}"/>`) },
+
+  // ── Free-standing notation symbols ──
+  crescendo_sign: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 50 L130 28 M20 50 L130 72" fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>` },
+  decrescendo_sign: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M140 50 L30 28 M140 50 L30 72" fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>` },
+  repeat: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <rect x="36" y="10" width="6" height="80" fill="${INK}"/>
+    <rect x="50" y="10" width="3" height="80" fill="${INK}"/>
+    <circle cx="62" cy="38" r="4" fill="${INK}"/><circle cx="62" cy="62" r="4" fill="${INK}"/>
+    <circle cx="98" cy="38" r="4" fill="${INK}"/><circle cx="98" cy="62" r="4" fill="${INK}"/>
+    <rect x="107" y="10" width="3" height="80" fill="${INK}"/>
+    <rect x="118" y="10" width="6" height="80" fill="${INK}"/>
+  </svg>` },
+  first_time_bar: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M30 50 L30 28 L130 28" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
+    <text x="78" y="22" font-family="Georgia,serif" font-size="26" font-weight="700" fill="${INK}" text-anchor="middle">1.</text>
+  </svg>` },
+  second_time_bar: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M30 50 L30 28 L130 28" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
+    <text x="78" y="22" font-family="Georgia,serif" font-size="26" font-weight="700" fill="${INK}" text-anchor="middle">2.</text>
+  </svg>` },
+  ottava: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <text x="38" y="62" font-family="Georgia,serif" font-style="italic" font-size="40" font-weight="700" fill="${INK}">8</text>
+    <path d="M62 50 L130 50" fill="none" stroke="${INK}" stroke-width="3" stroke-dasharray="7,6"/>
+    <path d="M130 50 L130 72" fill="none" stroke="${INK}" stroke-width="3"/>
+  </svg>` },
+  slur: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="38" cy="68" rx="11" ry="8" fill="${INK}"/>
+    <ellipse cx="122" cy="50" rx="11" ry="8" fill="${INK}"/>
+    <path d="M40 54 Q80 28 120 38" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
+  </svg>` },
+  tie: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="38" cy="65" rx="11" ry="8" fill="${INK}"/>
+    <ellipse cx="98" cy="65" rx="11" ry="8" fill="${INK}"/>
+    <path d="M42 48 Q68 26 94 48" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
+  </svg>` },
+  common_time: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <text x="80" y="76" font-family="Georgia,serif" font-size="70" font-weight="700" fill="${INK}" text-anchor="middle">C</text>
+  </svg>` },
+  alla_breve: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <text x="80" y="76" font-family="Georgia,serif" font-size="70" font-weight="700" fill="${INK}" text-anchor="middle">C</text>
+    <line x1="80" y1="14" x2="80" y2="86" stroke="${INK}" stroke-width="4"/>
+  </svg>` },
+  multi_bar_rest: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <text x="80" y="26" font-family="Georgia,serif" font-size="26" font-weight="700" fill="${INK}" text-anchor="middle">4</text>
+    <line x1="40" y1="38" x2="40" y2="62" stroke="${INK}" stroke-width="4"/>
+    <line x1="120" y1="38" x2="120" y2="62" stroke="${INK}" stroke-width="4"/>
+    <rect x="40" y="44" width="80" height="12" fill="${INK}"/>
+  </svg>` },
+  metronome: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="30" cy="68" rx="11" ry="8" fill="${INK}"/>
+    <line x1="41" y1="68" x2="41" y2="16" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
+    <text x="62" y="58" font-family="Georgia,serif" font-size="30" font-weight="700" fill="${INK}">=</text>
+    <text x="92" y="62" font-family="Georgia,serif" font-size="30" font-weight="700" fill="${INK}">88</text>
+  </svg>` },
+  dal_segno: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <line x1="35" y1="20" x2="125" y2="80" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="40" cy="80" r="6" fill="${INK}"/>
+    <circle cx="120" cy="20" r="6" fill="${INK}"/>
+    <path d="M62 38 C84 30, 84 56, 64 56 C44 56, 44 70, 64 64" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>
+  </svg>` },
+  repeated_notes: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="46" cy="72" rx="11" ry="8" fill="${INK}"/>
+    <line x1="57" y1="72" x2="57" y2="16" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
+    <line x1="42" y1="38" x2="70" y2="28" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>
+    <line x1="42" y1="52" x2="70" y2="42" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>
+  </svg>` },
+  repeated_bars: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <line x1="38" y1="80" x2="122" y2="20" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="46" cy="34" r="8" fill="${INK}"/>
+    <circle cx="114" cy="66" r="8" fill="${INK}"/>
+  </svg>` },
+
+  // ── Dynamics: typeset as styled marks, not drawn images ──
+  ppp: { type: 'text', text: 'ppp' }, fff: { type: 'text', text: 'fff' },
+  pp: { type: 'text', text: 'pp' }, p_dyn: { type: 'text', text: 'p' },
+  mp: { type: 'text', text: 'mp' }, mf: { type: 'text', text: 'mf' },
+  f_dyn: { type: 'text', text: 'f' }, ff: { type: 'text', text: 'ff' },
+  fp: { type: 'text', text: 'fp' }, sf: { type: 'text', text: 'sf' }, sfz: { type: 'text', text: 'sfz' },
+};
+
+function renderIcon(key) {
+  const icon = ICONS[key];
+  if (!icon) return '';
+  if (icon.type === 'text') return `<div class="dyn-mark">${icon.text}</div>`;
+  return `<div class="icon-svg">${icon.svg}</div>`;
+}
