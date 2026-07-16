@@ -29,63 +29,64 @@ function playSound(type) {
 function playDemo(termId) {
   AC.resume && AC.resume();
   try {
-    const base = 440; // A4
+    const base = 440; // A4 — used for demos that show ONE note's own envelope (fp/sfz/rf/pp..ff)
+    const scale = [262, 294, 330, 349, 392]; // C4 D4 E4 F4 G4 — used for phrase-based demos
     switch (termId) {
-      case 'staccato': [0, .25, .5].forEach(d => playTone(base, d, .06, 'sine', .4)); break;
-      case 'staccatissimo': [0, .18, .36].forEach(d => playTone(base, d, .03, 'sine', .45)); break;
-      case 'legato': { [440, 494, 523, 587].forEach((f, i) => playTone(f, i * .28, .35, 'sine', .3)); break; }
-      case 'slur': playTone(440, 0, .4, 'sine', .3); playTone(523, .35, .4, 'sine', .3); break;
-      case 'tie': playTone(440, 0, .8, 'sine', .3); break;
-      case 'crescendo': {
-        const o = AC.createOscillator(), g = AC.createGain();
-        o.connect(g); g.connect(AC.destination); o.type = 'sine'; o.frequency.value = 440;
-        const t = AC.currentTime;
-        g.gain.setValueAtTime(0.02, t); g.gain.linearRampToValueAtTime(0.5, t + 1.2);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 1.3); o.start(t); o.stop(t + 1.4);
+      // Detached, same pitch, clear gaps — staccatissimo shorter/tighter than staccato.
+      case 'staccato': [0, .3, .6].forEach(d => playTone(base, d, .12, 'sine', .45)); break;
+      case 'staccatissimo': [0, .22, .44].forEach(d => playTone(base, d, .05, 'sine', .5)); break;
+      // Smooth ascending run, notes overlapping slightly — the "connectedness" of legato.
+      case 'legato': scale.forEach((f, i) => playTone(f, i * .32, .4, 'sine', .35)); break;
+      case 'slur': playTone(330, 0, .45, 'sine', .35); playTone(392, .38, .5, 'sine', .35); break;
+      // A tie IS one continuous sound (two written notes, one held pitch) — single note is correct here.
+      case 'tie': playTone(base, 0, 1.0, 'sine', .35); break;
+      // A short ascending/descending phrase with the volume of each note stepped up/down —
+      // this is how a crescendo/decrescendo actually sounds across a passage, not one swelling tone.
+      case 'crescendo': scale.forEach((f, i) => playTone(f, i * .32, .38, 'sine', [.08, .18, .3, .45, .62][i])); break;
+      case 'decrescendo': [...scale].reverse().forEach((f, i) => playTone(f, i * .32, .38, 'sine', [.62, .45, .3, .18, .08][i])); break;
+      // Three same-pitch notes with the middle one emphasized — the emphasis only reads as
+      // "accented" in contrast to its (quieter) neighbours, not as an isolated loud beep.
+      case 'accent': [0, .32, .64].forEach((d, i) => playTone(349, d, .26, 'sine', i === 1 ? .8 : .28)); break;
+      // Marcato: stronger and more detached than accent — louder peak, shorter/clipped marked note.
+      case 'marcato': [0, .32, .64].forEach((d, i) => playTone(349, d, i === 1 ? .2 : .22, 'sine', i === 1 ? .95 : .3)); break;
+      // Tenuto: outer notes short & gapped; the middle note is held for its FULL value with no
+      // gap into the next note — that held-through connection is what "tenuto" sounds like.
+      case 'tenuto':
+        playTone(349, 0, .18, 'sine', .35);
+        playTone(349, .32, .48, 'sine', .45);
+        playTone(392, .8, .18, 'sine', .35);
         break;
-      }
-      case 'decrescendo': {
-        const o = AC.createOscillator(), g = AC.createGain();
-        o.connect(g); g.connect(AC.destination); o.type = 'sine'; o.frequency.value = 440;
-        const t = AC.currentTime;
-        g.gain.setValueAtTime(0.5, t); g.gain.linearRampToValueAtTime(0.02, t + 1.2);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 1.3); o.start(t); o.stop(t + 1.4);
-        break;
-      }
-      case 'accent': playTone(440, 0, .5, 'sine', .7); break;
-      case 'marcato': playTone(440, 0, .3, 'sine', .85); break;
-      case 'tenuto': playTone(440, 0, .7, 'sine', .4); break;
-      case 'portato': [0, .3, .6].forEach(d => playTone(440, d, .2, 'sine', .35)); break;
+      case 'portato': [0, .34, .68].forEach(d => playTone(349, d, .24, 'sine', .38)); break;
       case 'fp': {
         const o = AC.createOscillator(), g = AC.createGain();
-        o.connect(g); g.connect(AC.destination); o.type = 'sine'; o.frequency.value = 440;
+        o.connect(g); g.connect(AC.destination); o.type = 'sine'; o.frequency.value = base;
         const t = AC.currentTime;
-        g.gain.setValueAtTime(0.8, t); g.gain.linearRampToValueAtTime(0.05, t + 0.15);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.8); o.start(t); o.stop(t + 0.9);
+        g.gain.setValueAtTime(0.8, t); g.gain.linearRampToValueAtTime(0.08, t + 0.15);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 1.1); o.start(t); o.stop(t + 1.2);
         break;
       }
       case 'sfz': {
         const o = AC.createOscillator(), g = AC.createGain();
-        o.connect(g); g.connect(AC.destination); o.type = 'sawtooth'; o.frequency.value = 440;
+        o.connect(g); g.connect(AC.destination); o.type = 'sawtooth'; o.frequency.value = base;
         const t = AC.currentTime;
-        g.gain.setValueAtTime(0.9, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
-        o.start(t); o.stop(t + 0.4);
+        g.gain.setValueAtTime(0.9, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+        o.start(t); o.stop(t + 0.7);
         break;
       }
       case 'rf': {
         const o = AC.createOscillator(), g = AC.createGain();
-        o.connect(g); g.connect(AC.destination); o.type = 'sine'; o.frequency.value = 440;
+        o.connect(g); g.connect(AC.destination); o.type = 'sine'; o.frequency.value = base;
         const t = AC.currentTime;
-        g.gain.setValueAtTime(0.75, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
-        o.start(t); o.stop(t + 0.5);
+        g.gain.setValueAtTime(0.75, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+        o.start(t); o.stop(t + 0.8);
         break;
       }
-      case 'pp': playTone(440, 0, .6, 'sine', .05); break;
-      case 'p': playTone(440, 0, .6, 'sine', .12); break;
-      case 'mp': playTone(440, 0, .6, 'sine', .2); break;
-      case 'mf': playTone(440, 0, .6, 'sine', .3); break;
-      case 'f': playTone(440, 0, .6, 'sine', .5); break;
-      case 'ff': playTone(440, 0, .6, 'sine', .7); break;
+      case 'pp': playTone(base, 0, .9, 'sine', .05); break;
+      case 'p': playTone(base, 0, .9, 'sine', .12); break;
+      case 'mp': playTone(base, 0, .9, 'sine', .2); break;
+      case 'mf': playTone(base, 0, .9, 'sine', .3); break;
+      case 'f': playTone(base, 0, .9, 'sine', .5); break;
+      case 'ff': playTone(base, 0, .9, 'sine', .7); break;
     }
   } catch (e) {}
 }
@@ -275,6 +276,40 @@ function openTermsSigns() { currentModule = 'terms'; showScreen('topics'); }
 function openMusicInstrument() { currentModule = 'instrument'; showScreen('topics'); }
 
 // ══════════ TOPICS LIST (with mastery) ══════════
+// Photo credits for the Music Instrument module (data.js `photo` fields).
+// [term, author, license, source URL] — all from Wikimedia Commons.
+// CC0/Public Domain entries don't legally require attribution but are listed
+// anyway for transparency; CC BY / CC BY-SA entries require it.
+const PHOTO_CREDITS = [
+  ['Violin', 'Just plain Bill', 'CC0', 'https://commons.wikimedia.org/wiki/File:Violin_VL100.png'],
+  ['Viola', 'Just plain Bill', 'Public Domain', 'https://commons.wikimedia.org/wiki/File:Bratsche.jpg'],
+  ['Cello', 'JøMa', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Cello_unbekannter_Herkunft.jpg'],
+  ['Double bass', 'Andrew Kepert', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:AGK_bass1_full.jpg'],
+  ['Harp', 'Metropolitan Museum of Art', 'CC0', 'https://commons.wikimedia.org/wiki/File:Pedal_Harp_MET_134276.jpg'],
+  ['Flute', 'Petar Milošević', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Western_concert_flute_(Yamaha).jpg'],
+  ['Piccolo', 'User:Caesura', 'Public Domain', 'https://commons.wikimedia.org/wiki/File:Piccolo.jpg'],
+  ['Oboe', 'Fratelli Patricola (ed. Gisbert K)', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Oboe_Patricola_Artista_PT1.jpg'],
+  ['Cor anglais', 'Hustvedt', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:English_Horn_picture.jpg'],
+  ['Clarinet', 'mark.drummer', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:Clarinet_001.jpg'],
+  ['Bass clarinet', 'F. Arthur Uebel GmbH', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:FAU_Bass_B_Mp.jpg'],
+  ['Bassoon', 'Mezzofortist', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Bassoon.jpg'],
+  ['Double bassoon', 'Mezzofortist', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Contrabassoon2.jpg'],
+  ['Saxophone', 'TR001', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Yamaha_YAS-25_Alto_Saxophone_20080502.jpg'],
+  ['Trumpet', 'Yamaha Corporation', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Yamaha_Trumpet_YTR-8335LA_crop.jpg'],
+  ['Cornet', 'Yamaha Corporation', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Yamaha_Cornet_YCR-6330II_crop.png'],
+  ['Horn in F', 'Yamaha Corporation (bg: Habitator terrae)', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Yamaha_Horn_YHR-667V.png'],
+  ['Trombone', 'Yamaha Corporation', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Yamaha_Tenor_trombone_YSL-891Z_(re-crop).jpg'],
+  ['Tuba', 'Yamaha Corporation', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Yamaha_Bass_tuba_YFB-822.tif'],
+  ['Timpani', 'Jorge Royan', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Munich_-_A_standard_set_of_timpani_Percussion_-_5647.jpg'],
+  ['Xylophone', 'Daderot', 'CC0', 'https://commons.wikimedia.org/wiki/File:NBC_Xylophone,_c._1930,_gift_of_NBC_Radio_Chicago,_WMAQ_-_Museum_of_Science_and_Industry_(Chicago)_-_DSC06687.JPG'],
+  ['Glockenspiel', 'flamurai', 'Public Domain', 'https://commons.wikimedia.org/wiki/File:Glockenspiel-malletech.jpg'],
+  ['Side drum', 'Englishteacher68', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Pearl_Reference_Snare_drum.jpg'],
+  ['Bass drum', 'Žiga', 'CC0', 'https://commons.wikimedia.org/wiki/File:Gran_cassa.jpg'],
+  ['Triangle', 'Philip.t.day', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Triangle_001.jpg'],
+  ['Cymbals', 'Andrewa', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Clash_cymbals.jpg'],
+  ['Tambourine', 'GigNroll.com', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:Hand_tambourine_(by_GigNroll.com).jpg'],
+];
+
 function renderTopics() {
   const titles = { terms: ['Terms & Signs', 'Choose a category'], instrument: ['Music Instrument', 'Choose a family'] };
   document.getElementById('topicsTitle').textContent = titles[currentModule][0];
@@ -314,6 +349,15 @@ function renderTopics() {
     card.onclick = () => openLessonMap(topic);
     list.appendChild(card);
   });
+  if (currentModule === 'instrument') {
+    const credits = document.createElement('details');
+    credits.className = 'photo-credits';
+    credits.innerHTML = `<summary>📷 Photo credits</summary>
+      <ul>${PHOTO_CREDITS.map(([term, author, license, url]) =>
+        `<li>${term} — ${author}, <a href="${url}" target="_blank" rel="noopener">${license}</a></li>`
+      ).join('')}</ul>`;
+    list.appendChild(credits);
+  }
 }
 
 // ══════════ FLASHCARDS (swipe + display toggle) ══════════
@@ -460,14 +504,17 @@ function renderCard() {
       <div class="card-meaning" style="font-size:20px;">${item.meaning}</div>`;
   } else {
     const emojiHtml = item.emoji ? `<div class="card-emoji">${item.emoji}</div>` : '';
+    const photoHtml = item.photo ? `<div class="card-img-wrap"><img src="${item.photo}" alt="${item.term}"></div>` : '';
     frontHTML = `
       <div class="card-hint">Tap to reveal</div>
       ${iconHtml ? `<div class="card-img-wrap">${iconHtml}</div>` : ''}
+      ${photoHtml}
       ${emojiHtml}
       <div class="card-term">${item.term}</div>
       ${demoBtn}`;
     backHTML = `
       <div class="card-hint">Meaning</div>
+      ${photoHtml}
       ${emojiHtml}
       <div class="card-term-name" style="font-size:20px;opacity:.85;">${item.term}</div>
       <div class="card-meaning" style="font-size:20px;">${item.meaning}</div>`;
@@ -679,7 +726,8 @@ function renderQuestion() {
   if (q.kind === 'match') { renderMatchRound(q, color); return; }
 
   const imgHtml = q.img && ICONS[q.img] ? `<div class="question-img">${renderIcon(q.img)}</div>`
-    : (q.item && q.item.emoji ? `<div class="question-img card-emoji" style="margin:12px auto;">${q.item.emoji}</div>` : '');
+    : (q.item && q.item.photo ? `<div class="question-img"><img src="${q.item.photo}" alt=""></div>`
+    : (q.item && q.item.emoji ? `<div class="question-img card-emoji" style="margin:12px auto;">${q.item.emoji}</div>` : ''));
   document.getElementById('quizBody').innerHTML = `
     <div class="question-card">
       <div class="question-type-badge" style="background:${color}1a;color:${color}">${q.type}</div>
@@ -828,6 +876,8 @@ function showFeedback(ok, correct, q) {
   const fi = document.getElementById('feedbackImg');
   if (!ok && q.item && q.item.img && ICONS[q.item.img]) {
     fi.innerHTML = renderIcon(q.item.img); fi.style.display = 'block';
+  } else if (!ok && q.item && q.item.photo) {
+    fi.innerHTML = `<img src="${q.item.photo}" alt="">`; fi.style.display = 'block';
   } else {
     fi.innerHTML = ''; fi.style.display = 'none';
   }

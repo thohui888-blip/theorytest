@@ -6,11 +6,17 @@
 //           are actually typeset in real scores (more accurate than a drawn image)
 const INK = '#1f2430';
 
-// Reusable note template (filled notehead + stem), used by articulation marks
-// that are notated directly above the note. Generous gap between the mark
-// zone (y 4-28) and the stem top (y 35) keeps each mark legible on its own.
+// Reusable note template (filled notehead + stem, stem-up so the notehead
+// sits at the bottom). Marks are centered on the NOTEHEAD (cx 60), not the
+// stem (x 73) — a mark attaches to the notehead, the stem just happens to
+// exit near its right edge. Two mark zones:
+//   "above" (y 4-28, above the stem tip)   -> fermata only: it always sits
+//     above the note regardless of stem direction, unlike other marks.
+//   "below" (y 104-130, right under the notehead) -> staccato/accent/tenuto/
+//     marcato/staccatissimo/portato: these go on the notehead side OPPOSITE
+//     the stem, so for this stem-up template that's below the notehead.
 function noteWithMark(markSvg) {
-  return `<svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+  return `<svg viewBox="0 0 160 140" xmlns="http://www.w3.org/2000/svg">
     <ellipse cx="60" cy="90" rx="14" ry="10" fill="${INK}"/>
     <line x1="73" y1="90" x2="73" y2="35" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
     ${markSvg}
@@ -18,14 +24,15 @@ function noteWithMark(markSvg) {
 }
 
 const ICONS = {
-  // ── Articulation marks (drawn above a note) ──
-  staccato: { type: 'svg', svg: noteWithMark(`<circle cx="73" cy="16" r="6" fill="${INK}"/>`) },
-  staccatissimo: { type: 'svg', svg: noteWithMark(`<path d="M73 5 L80 27 L66 27 Z" fill="${INK}"/>`) },
-  accent: { type: 'svg', svg: noteWithMark(`<path d="M53 9 L93 18 L53 27" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`) },
-  marcato: { type: 'svg', svg: noteWithMark(`<path d="M53 28 L73 6 L93 28" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`) },
-  tenuto: { type: 'svg', svg: noteWithMark(`<line x1="55" y1="18" x2="91" y2="18" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>`) },
-  mezzo_staccato: { type: 'svg', svg: noteWithMark(`<line x1="56" y1="8" x2="90" y2="8" stroke="${INK}" stroke-width="6" stroke-linecap="round"/><circle cx="73" cy="24" r="5" fill="${INK}"/>`) },
-  fermata: { type: 'svg', svg: noteWithMark(`<path d="M43 28 A30 24 0 0 1 103 28" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round"/><circle cx="73" cy="22" r="5" fill="${INK}"/>`) },
+  // ── Articulation marks: notehead-side placement (opposite the stem) ──
+  staccato: { type: 'svg', svg: noteWithMark(`<circle cx="60" cy="112" r="6" fill="${INK}"/>`) },
+  staccatissimo: { type: 'svg', svg: noteWithMark(`<path d="M60 130 L67 108 L53 108 Z" fill="${INK}"/>`) },
+  accent: { type: 'svg', svg: noteWithMark(`<path d="M40 108 L80 117 L40 126" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`) },
+  marcato: { type: 'svg', svg: noteWithMark(`<path d="M40 108 L60 128 L80 108" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`) },
+  tenuto: { type: 'svg', svg: noteWithMark(`<line x1="42" y1="110" x2="78" y2="110" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>`) },
+  mezzo_staccato: { type: 'svg', svg: noteWithMark(`<circle cx="60" cy="110" r="5" fill="${INK}"/><line x1="42" y1="124" x2="78" y2="124" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>`) },
+  // Fermata is the one exception: always above the note, never flips with stem direction.
+  fermata: { type: 'svg', svg: noteWithMark(`<path d="M30 28 A30 24 0 0 1 90 28" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round"/><circle cx="60" cy="22" r="5" fill="${INK}"/>`) },
 
   // ── Free-standing notation symbols ──
   crescendo_sign: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
