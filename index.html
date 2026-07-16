@@ -13,7 +13,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Piano Theory</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=2">
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 
@@ -95,6 +95,18 @@
   <div class="topics-list" id="topicsList"></div>
 </div>
 
+<!-- LESSON MAP: nodes inside a topic -->
+<div id="lessonmap" class="screen">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showScreen('topics')">←</button>
+    <div>
+      <div class="top-bar-title" id="lessonmapTitle">Category</div>
+      <div class="top-bar-sub" id="lessonmapSub">Choose a lesson</div>
+    </div>
+  </div>
+  <div class="lesson-path" id="lessonmapList"></div>
+</div>
+
 <!-- LEARN -->
 <div id="learn" class="screen">
   <div class="learn-header">
@@ -134,12 +146,12 @@
   <div class="score-circle"><div class="score-num" id="resultScore">10</div><div class="score-denom" id="resultDenom">/ 10</div></div>
   <div class="result-btns">
     <button class="btn-primary" onclick="retryQuiz()" id="retryBtn">🔄 Try Again</button>
-    <button class="btn-secondary" onclick="showScreen('main')">🏠 Home</button>
+    <button class="btn-secondary" id="resultHomeBtn" onclick="resultBack()">🏠 Home</button>
   </div>
 </div>
 
 <script src="data.js?v=6"></script>
 <script src="icons.js?v=6"></script>
-<script src="app.js?v=6"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>

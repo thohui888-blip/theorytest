@@ -153,6 +153,65 @@ function isMastered(item) {
   return st && (st.correctStreak || 0) >= 3;
 }
 
+// ══════════ LESSON PATH (chunks a topic into small unlockable nodes) ══════════
+// Computed on the fly from data.js — never persisted, so editing TOPICS content
+// doesn't require a migration. Only the progress counters below are stored.
+const LESSON_SIZE = 6;
+const REVIEW_EVERY = 3; // insert a review node after every N lessons
+
+function chunk(arr, n) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
+  return out;
+}
+
+function buildPath(topic) {
+  const lessonChunks = chunk(topic.items, LESSON_SIZE);
+  const nodes = [];
+  let sinceReview = [];
+  lessonChunks.forEach((items, i) => {
+    nodes.push({ type: 'lesson', items });
+    sinceReview = sinceReview.concat(items);
+    const lessonNumber = i + 1;
+    const isLastLesson = i === lessonChunks.length - 1;
+    if (lessonNumber % REVIEW_EVERY === 0 || (isLastLesson && sinceReview.length > 0)) {
+      nodes.push({ type: 'review', items: sinceReview });
+      sinceReview = [];
+    }
+  });
+  return nodes;
+}
+
+// pianoTheory_progress_<user> = { "<topicId>": { unlocked:1, completed:[] } }
+function getProgress() {
+  if (!currentUser) return {};
+  try { return JSON.parse(localStorage.getItem('pianoTheory_progress_' + currentUser)) || {}; } catch (e) { return {}; }
+}
+function saveProgress(p) {
+  if (!currentUser) return;
+  try { localStorage.setItem('pianoTheory_progress_' + currentUser, JSON.stringify(p)); } catch (e) {}
+}
+function getTopicProgress(topicId) {
+  return getProgress()[topicId] || { unlocked: 1, completed: [] };
+}
+function completeNode(topic, nodeIndex) {
+  const nodes = buildPath(topic);
+  const p = getProgress();
+  const tp = p[topic.id] || { unlocked: 1, completed: [] };
+  tp.completed[nodeIndex] = true;
+  tp.unlocked = Math.min(nodes.length, Math.max(tp.unlocked, nodeIndex + 2));
+  p[topic.id] = tp;
+  saveProgress(p);
+}
+// Item pool for Daily Review: only items from unlocked *lesson* nodes (review
+// nodes resurface the same items, so including them would double-count).
+function unlockedItems() {
+  return currentModuleTopics().flatMap(topic => {
+    const unlocked = getTopicProgress(topic.id).unlocked;
+    return buildPath(topic).slice(0, unlocked).filter(n => n.type === 'lesson').flatMap(n => n.items);
+  });
+}
+
 // ══════════ USER SELECT SCREEN ══════════
 function renderUsers() {
   const list = document.getElementById('userList');
@@ -202,6 +261,7 @@ function showScreen(id) {
   hideFeedback();
   AC.resume && AC.resume();
   if (id === 'topics') renderTopics();
+  if (id === 'lessonmap') renderLessonMap();
 }
 
 // Active module determines which topic array/screen-title renderTopics() uses.
@@ -237,32 +297,87 @@ function renderTopics() {
   currentModuleTopics().forEach(topic => {
     const mastered = topic.items.filter(isMastered).length;
     const pct = Math.round(mastered / topic.items.length * 100);
+    const nodes = buildPath(topic);
+    const lessonIndices = nodes.map((n, i) => i).filter(i => nodes[i].type === 'lesson');
+    const tp = getTopicProgress(topic.id);
+    const doneLessons = lessonIndices.filter(i => tp.completed[i]).length;
     const card = document.createElement('div');
     card.className = 'topic-card';
     card.innerHTML = `
       <div class="topic-icon" style="background:${topic.color}1a;color:${topic.color}">${topic.icon}</div>
       <div class="topic-info">
         <div class="topic-name">${topic.name}</div>
-        <div class="topic-count">${topic.items.length} terms · ${mastered} mastered</div>
+        <div class="topic-count">${topic.items.length} terms · ${mastered} mastered · ${doneLessons}/${lessonIndices.length} lessons</div>
         <div class="mastery-bar"><div class="mastery-fill" style="width:${pct}%;background:${topic.color}"></div></div>
       </div>
       <div class="chevron">›</div>`;
-    card.onclick = () => selectTopic(topic);
+    card.onclick = () => openLessonMap(topic);
     list.appendChild(card);
   });
 }
 
 // ══════════ FLASHCARDS (swipe + display toggle) ══════════
 let currentTopic = null, learnIndex = 0, cardFlipped = false;
+let currentItems = [], currentNodeIndex = 0;
 let touchStartX = 0, touchStartY = 0;
 
-function selectTopic(t) {
-  currentTopic = t; learnIndex = 0; cardFlipped = false;
-  renderCard(); showScreen('learn');
+// ══════════ LESSON MAP (nodes inside a topic) ══════════
+function openLessonMap(topic) {
+  currentTopic = topic;
+  showScreen('lessonmap');
+}
+
+// Duolingo-style zigzag path: nodes offset left/right in a repeating pattern,
+// with a dashed guide line behind them and a bouncing "START" badge over the
+// one actionable node (unlock is strictly sequential, so there's ever at most one).
+const PATH_OFFSETS = [0, 64, 0, -64];
+
+function renderLessonMap() {
+  document.getElementById('lessonmapTitle').textContent = currentTopic.name;
+  document.getElementById('lessonmapSub').textContent = 'Choose a lesson';
+  const nodes = buildPath(currentTopic);
+  const tp = getTopicProgress(currentTopic.id);
+  const list = document.getElementById('lessonmapList');
+  list.innerHTML = '';
+  let lessonNumber = 0;
+  nodes.forEach((node, i) => {
+    const locked = i >= tp.unlocked;
+    const completed = !!tp.completed[i];
+    const isReview = node.type === 'review';
+    const isCurrent = !locked && !completed;
+    if (!isReview) lessonNumber++;
+    const label = isReview ? 'Review' : `Lesson ${lessonNumber}`;
+    const icon = completed ? '✓' : (locked ? '🔒' : (isReview ? '⭐' : currentTopic.icon));
+    const btnStyle = (!isReview && !locked && !completed) ? ` style="background:${currentTopic.color}"` : '';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'path-node-wrap';
+    wrap.style.setProperty('--offset', PATH_OFFSETS[i % PATH_OFFSETS.length] + 'px');
+    wrap.innerHTML = `
+      ${isCurrent ? '<div class="path-start-badge">START</div>' : ''}
+      <button class="path-node${locked ? ' locked' : ''}${completed ? ' completed' : ''}${isReview ? ' review' : ''}"${btnStyle} ${locked ? 'disabled' : ''}>${icon}</button>
+      <div class="path-node-label">${label}</div>`;
+    if (!locked) wrap.querySelector('.path-node').onclick = () => selectNode(i);
+    list.appendChild(wrap);
+  });
+}
+
+function selectNode(nodeIndex) {
+  const node = buildPath(currentTopic)[nodeIndex];
+  currentNodeIndex = nodeIndex;
+  currentItems = node.items;
+  if (node.type === 'review') {
+    quizMode = 'review';
+    beginQuizForCurrentNode();
+  } else {
+    quizMode = 'lesson';
+    learnIndex = 0; cardFlipped = false;
+    renderCard(); showScreen('learn');
+  }
 }
 
 function renderCard() {
-  const items = currentTopic.items, total = items.length, item = items[learnIndex];
+  const items = currentItems, total = items.length, item = items[learnIndex];
   const isLast = learnIndex === total - 1;
   const color = currentTopic.color;
   const pct = (learnIndex / total) * 100;
@@ -365,7 +480,7 @@ function prevCard() { if (learnIndex > 0) { learnIndex--; cardFlipped = false; r
 
 // ══════════ QUIZ ══════════
 let quizQuestions = [], currentQIndex = 0, correctCount = 0, totalAnswered = 0, answered = false;
-let quizMode = 'topic'; // 'topic' | 'daily' | 'weak'
+let quizMode = 'lesson'; // 'lesson' | 'review' | 'daily' | 'weak'
 let quizTotal = 0;
 let quizPool = []; // items pool for wrong-option generation
 
@@ -392,8 +507,9 @@ function makeQuestion(item, pool) {
   const r = Math.random();
   let qtype;
   if (item.type === 'imgonly') { qtype = 'img_to_name'; }
-  else if (hasImg && r < 0.3) { qtype = 'img_to_name'; }
-  else if (r < 0.65 || pool.length < 4) { qtype = 'term_to_meaning'; }
+  else if (hasImg && r < 0.25) { qtype = 'img_to_name'; }
+  else if (r < 0.45) { qtype = 'truefalse'; }
+  else if (r < 0.75 || pool.length < 4) { qtype = 'term_to_meaning'; }
   else { qtype = 'meaning_to_term'; }
 
   if (qtype === 'img_to_name') {
@@ -402,25 +518,55 @@ function makeQuestion(item, pool) {
   } else if (qtype === 'term_to_meaning') {
     const opts = shuffle([item.meaning, ...wrongs.map(w => w.meaning)]);
     return { q: termLabel(item), img: item.type === 'normal' ? (item.img || null) : null, answer: item.meaning, options: opts, type: 'What does this mean?', item };
+  } else if (qtype === 'truefalse') {
+    const canBeFalse = wrongs.length > 0;
+    const showTrue = !canBeFalse || Math.random() < 0.5;
+    const shownMeaning = showTrue ? item.meaning : wrongs[0].meaning;
+    return {
+      q: `${termLabel(item)} means "${shownMeaning}"`,
+      img: item.type === 'normal' ? (item.img || null) : null,
+      answer: showTrue ? 'True' : 'False', options: ['True', 'False'], type: 'True or False?', item
+    };
   } else {
     const opts = shuffle([termLabel(item), ...wrongs.map(w => termLabel(w))]);
     return { q: item.meaning, img: null, answer: termLabel(item), options: opts, type: 'Which term means this?', item };
   }
 }
 
-function startQuiz() {
-  quizMode = 'topic';
+// Batches shuffled items into single questions, occasionally grouping a run of
+// 4 into a 'match' round instead (needs >=4 items left to avoid an under-filled round).
+function buildQuizQueue(shuffledItems, pool) {
+  const queue = [];
+  let i = 0;
+  while (i < shuffledItems.length) {
+    const remaining = shuffledItems.length - i;
+    if (remaining >= 4 && Math.random() < 0.25) {
+      queue.push({ kind: 'match', items: shuffledItems.slice(i, i + 4) });
+      i += 4;
+    } else {
+      queue.push(makeQuestion(shuffledItems[i], pool));
+      i++;
+    }
+  }
+  return queue;
+}
+
+// Shared by the flashcard "Start Quiz" button and review nodes (which skip
+// flashcards and jump straight into the quiz since it's revision, not new material).
+function beginQuizForCurrentNode() {
   quizPool = currentTopic.items;
-  const items = shuffle(currentTopic.items);
-  quizQuestions = items.map(i => makeQuestion(i, quizPool));
+  const items = shuffle(currentItems);
+  quizQuestions = buildQuizQueue(items, quizPool);
   quizTotal = items.length;
   beginQuiz();
 }
 
+function startQuiz() { beginQuizForCurrentNode(); }
+
 function startDailyReview() {
   quizMode = 'daily';
   currentModule = 'terms'; // Daily Review banner is on the home screen, always reviews Terms & Signs
-  const all = allItems();
+  const all = unlockedItems();
   const stats = getStats();
   // Priority: weak terms first, then never-seen, then least-recently-seen
   const scored = all.map(item => {
@@ -434,7 +580,7 @@ function startDailyReview() {
   scored.sort((a, b) => b.score - a.score);
   const picked = scored.slice(0, 10).map(s => s.item);
   quizPool = all;
-  quizQuestions = shuffle(picked).map(i => makeQuestion(i, quizPool));
+  quizQuestions = buildQuizQueue(shuffle(picked), quizPool);
   quizTotal = picked.length;
   beginQuiz();
 }
@@ -444,7 +590,7 @@ function startWeakQuiz() {
   const weak = getAllWeakItems();
   if (weak.length === 0) return;
   quizPool = allItems();
-  quizQuestions = shuffle(weak).map(i => makeQuestion(i, quizPool));
+  quizQuestions = buildQuizQueue(shuffle(weak), quizPool);
   quizTotal = weak.length;
   beginQuiz();
 }
@@ -455,22 +601,35 @@ function beginQuiz() {
 }
 
 function quizColor() {
-  if (quizMode === 'topic') return currentTopic.color;
-  if (quizMode === 'daily') return '#f5a524';
-  return '#ef4444';
+  if (quizMode === 'lesson') return currentTopic.color;
+  if (quizMode === 'review' || quizMode === 'daily') return '#f5a524';
+  return '#ef4444'; // weak
 }
 
 function quizExit() {
-  showScreen(quizMode === 'topic' ? 'topics' : 'main');
+  showScreen((quizMode === 'lesson' || quizMode === 'review') ? 'lessonmap' : 'main');
+}
+
+function updateQuizProgress() {
+  const color = quizColor();
+  const prog = document.getElementById('quizProgress');
+  prog.style.width = (correctCount / quizTotal * 100) + '%'; prog.style.background = color;
+  document.getElementById('quizProgressLabel').textContent = `${correctCount}/${quizTotal}`;
+}
+
+function advanceQueue() {
+  currentQIndex++;
+  if (correctCount >= quizTotal) showResult();
+  else renderQuestion();
 }
 
 function renderQuestion() {
   hideFeedback(); answered = false;
   const q = quizQuestions[currentQIndex];
   const color = quizColor();
-  const prog = document.getElementById('quizProgress');
-  prog.style.width = (correctCount / quizTotal * 100) + '%'; prog.style.background = color;
-  document.getElementById('quizProgressLabel').textContent = `${correctCount}/${quizTotal}`;
+  updateQuizProgress();
+
+  if (q.kind === 'match') { renderMatchRound(q, color); return; }
 
   const imgHtml = q.img && ICONS[q.img] ? `<div class="question-img">${renderIcon(q.img)}</div>`
     : (q.item && q.item.emoji ? `<div class="question-img card-emoji" style="margin:12px auto;">${q.item.emoji}</div>` : '');
@@ -483,6 +642,74 @@ function renderQuestion() {
     <div class="options-grid">
       ${q.options.map(opt => `<button class="option-btn" onclick="selectAnswer(this,'${esc(opt)}','${esc(q.answer)}')">${opt}</button>`).join('')}
     </div>`;
+}
+
+// ══════════ MATCHING ROUND (pairs a batch of terms with their meanings) ══════════
+let matchItems = [], matchRemaining = [], matchSelLeft = null, matchSelRight = null;
+
+function renderMatchRound(q, color) {
+  matchItems = q.items;
+  matchRemaining = matchItems.map((_, i) => i);
+  matchSelLeft = null; matchSelRight = null;
+  const leftOrder = shuffle(matchItems.map((_, i) => i));
+  const rightOrder = shuffle(matchItems.map((_, i) => i));
+  document.getElementById('quizBody').innerHTML = `
+    <div class="question-card">
+      <div class="question-type-badge" style="background:${color}1a;color:${color}">Match the pairs</div>
+      <div class="question-text" style="font-size:14px;">Tap a term, then its meaning</div>
+    </div>
+    <div class="match-grid">
+      <div class="match-col" id="matchLeft">
+        ${leftOrder.map(i => `<button class="match-btn" data-idx="${i}">${termLabel(matchItems[i])}</button>`).join('')}
+      </div>
+      <div class="match-col" id="matchRight">
+        ${rightOrder.map(i => `<button class="match-btn" data-idx="${i}">${matchItems[i].meaning}</button>`).join('')}
+      </div>
+    </div>`;
+  document.querySelectorAll('#matchLeft .match-btn').forEach(b => b.onclick = () => matchPick('left', b));
+  document.querySelectorAll('#matchRight .match-btn').forEach(b => b.onclick = () => matchPick('right', b));
+}
+
+function matchPick(side, btn) {
+  if (btn.disabled) return;
+  if (side === 'left') {
+    if (matchSelLeft) matchSelLeft.classList.remove('picked');
+    matchSelLeft = btn; btn.classList.add('picked');
+  } else {
+    if (matchSelRight) matchSelRight.classList.remove('picked');
+    matchSelRight = btn; btn.classList.add('picked');
+  }
+  if (!matchSelLeft || !matchSelRight) return;
+
+  const leftIdx = +matchSelLeft.dataset.idx, rightIdx = +matchSelRight.dataset.idx;
+  const item = matchItems[leftIdx];
+  const leftEl = matchSelLeft, rightEl = matchSelRight;
+  AC.resume && AC.resume();
+  totalAnswered++;
+
+  if (leftIdx === rightIdx) {
+    leftEl.classList.remove('picked'); rightEl.classList.remove('picked');
+    leftEl.classList.add('matched'); rightEl.classList.add('matched');
+    leftEl.disabled = true; rightEl.disabled = true;
+    recordAnswer(item, true); playSound('correct'); correctCount++;
+    matchRemaining = matchRemaining.filter(i => i !== leftIdx);
+    updateQuizProgress();
+  } else {
+    leftEl.classList.add('wrong'); rightEl.classList.add('wrong');
+    leftEl.disabled = true; rightEl.disabled = true;
+    recordAnswer(item, false); playSound('wrong');
+    quizQuestions.push(makeQuestion(item, quizPool));
+    matchRemaining = matchRemaining.filter(i => i !== leftIdx);
+    const orphanRight = document.querySelector(`#matchRight .match-btn[data-idx="${leftIdx}"]`);
+    if (orphanRight) orphanRight.disabled = true;
+    setTimeout(() => {
+      leftEl.classList.add('gone');
+      if (orphanRight) orphanRight.classList.add('gone');
+      rightEl.classList.remove('wrong', 'picked'); rightEl.disabled = false;
+    }, 500);
+  }
+  matchSelLeft = null; matchSelRight = null;
+  if (matchRemaining.length === 0) setTimeout(advanceQueue, 500);
 }
 
 function esc(s) { return s.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
@@ -521,11 +748,7 @@ function showFeedback(ok, correct, q) {
 
 function hideFeedback() { document.getElementById('feedbackBar').className = 'feedback-bar'; }
 
-function nextQuestion() {
-  currentQIndex++;
-  if (correctCount >= quizTotal) showResult();
-  else renderQuestion();
-}
+function nextQuestion() { advanceQueue(); }
 
 function showResult() {
   hideFeedback();
@@ -533,15 +756,26 @@ function showResult() {
   const perfect = totalAnswered === quizTotal;
   document.getElementById('resultEmoji').textContent = perfect ? '🏆' : '🎉';
   document.getElementById('resultTitle').textContent = perfect ? 'Perfect score!' : 'All done!';
-  const subName = quizMode === 'topic' ? currentTopic.name : (quizMode === 'daily' ? 'Daily Review' : 'Weak Terms');
+  let subName;
+  if (quizMode === 'lesson' || quizMode === 'review') {
+    subName = quizMode === 'review' ? `${currentTopic.name} · Review` : currentTopic.name;
+    completeNode(currentTopic, currentNodeIndex); // reaching results = all items answered correctly at least once
+  } else {
+    subName = quizMode === 'daily' ? 'Daily Review' : 'Weak Terms';
+  }
   document.getElementById('resultSub').textContent = subName + (perfect ? '' : ` · ${totalAnswered - quizTotal} retried`);
   document.getElementById('resultScore').textContent = quizTotal;
   document.getElementById('resultDenom').textContent = '/ ' + quizTotal;
-  document.getElementById('retryBtn').style.display = quizMode === 'topic' ? 'block' : 'none';
+  document.getElementById('retryBtn').style.display = (quizMode === 'lesson' || quizMode === 'review') ? 'block' : 'none';
+  document.getElementById('resultHomeBtn').textContent = (quizMode === 'lesson' || quizMode === 'review') ? '📍 Lesson Map' : '🏠 Home';
   showScreen('result');
 }
 
-function retryQuiz() { startQuiz(); }
+function retryQuiz() { beginQuizForCurrentNode(); }
+
+function resultBack() {
+  showScreen((quizMode === 'lesson' || quizMode === 'review') ? 'lessonmap' : 'main');
+}
 
 // ══════════ INIT ══════════
 renderUsers();
