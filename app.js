@@ -360,7 +360,54 @@ function renderLessonMap() {
     if (!locked) wrap.querySelector('.path-node').onclick = () => selectNode(i);
     list.appendChild(wrap);
   });
+  drawLessonPathLine();
 }
+
+// Smooth quadratic-bezier-through-midpoints curve — connects the *actual*
+// rendered centers of each node (post-zigzag-transform), not a straight
+// guess. Re-measures via getBoundingClientRect() so it always matches reality.
+function smoothPathD(points) {
+  if (points.length < 2) return '';
+  let d = `M ${points[0].x},${points[0].y}`;
+  for (let i = 1; i < points.length - 1; i++) {
+    const p = points[i], next = points[i + 1];
+    const midX = (p.x + next.x) / 2, midY = (p.y + next.y) / 2;
+    d += ` Q ${p.x},${p.y} ${midX},${midY}`;
+  }
+  const last = points[points.length - 1], prev = points[points.length - 2];
+  d += ` Q ${prev.x},${prev.y} ${last.x},${last.y}`;
+  return d;
+}
+
+function drawLessonPathLine() {
+  const list = document.getElementById('lessonmapList');
+  const old = document.getElementById('lessonPathSvg');
+  if (old) old.remove();
+  const wraps = Array.from(list.querySelectorAll('.path-node-wrap'));
+  if (wraps.length < 2) return;
+  const listRect = list.getBoundingClientRect();
+  const points = wraps.map(w => {
+    const r = w.querySelector('.path-node').getBoundingClientRect();
+    return { x: r.left + r.width / 2 - listRect.left, y: r.top + r.height / 2 - listRect.top };
+  });
+  const svgNs = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNs, 'svg');
+  svg.setAttribute('id', 'lessonPathSvg');
+  svg.setAttribute('class', 'lesson-path-svg');
+  const path = document.createElementNS(svgNs, 'path');
+  path.setAttribute('d', smoothPathD(points));
+  path.setAttribute('fill', 'none');
+  path.style.stroke = 'var(--line)';
+  path.style.strokeWidth = '4';
+  path.style.strokeDasharray = '2 12';
+  path.style.strokeLinecap = 'round';
+  svg.appendChild(path);
+  list.insertBefore(svg, list.firstChild);
+}
+window.addEventListener('resize', () => {
+  const el = document.getElementById('lessonmap');
+  if (el && el.classList.contains('active')) drawLessonPathLine();
+});
 
 function selectNode(nodeIndex) {
   const node = buildPath(currentTopic)[nodeIndex];
@@ -645,12 +692,12 @@ function renderQuestion() {
 }
 
 // ══════════ MATCHING ROUND (pairs a batch of terms with their meanings) ══════════
-let matchItems = [], matchRemaining = [], matchSelLeft = null, matchSelRight = null;
+let matchItems = [], matchRemaining = [], matchSelLeft = null, matchSelRight = null, matchPendingWrong = null;
 
 function renderMatchRound(q, color) {
   matchItems = q.items;
   matchRemaining = matchItems.map((_, i) => i);
-  matchSelLeft = null; matchSelRight = null;
+  matchSelLeft = null; matchSelRight = null; matchPendingWrong = null;
   const leftOrder = shuffle(matchItems.map((_, i) => i));
   const rightOrder = shuffle(matchItems.map((_, i) => i));
   document.getElementById('quizBody').innerHTML = `
@@ -659,6 +706,7 @@ function renderMatchRound(q, color) {
       <div class="question-text" style="font-size:14px;">Tap a term, then its meaning</div>
     </div>
     <div class="match-grid">
+      <svg class="match-lines-svg" id="matchLinesSvg"></svg>
       <div class="match-col" id="matchLeft">
         ${leftOrder.map(i => `<button class="match-btn" data-idx="${i}">${termLabel(matchItems[i])}</button>`).join('')}
       </div>
@@ -670,8 +718,28 @@ function renderMatchRound(q, color) {
   document.querySelectorAll('#matchRight .match-btn').forEach(b => b.onclick = () => matchPick('right', b));
 }
 
+// Draws a straight connector between a matched left/right button pair so it's
+// visually obvious which term paired with which meaning (not just color).
+function drawMatchLine(leftEl, rightEl, strokeColor) {
+  const svg = document.getElementById('matchLinesSvg');
+  if (!svg) return null;
+  const svgRect = svg.getBoundingClientRect();
+  const lr = leftEl.getBoundingClientRect(), rr = rightEl.getBoundingClientRect();
+  const svgNs = 'http://www.w3.org/2000/svg';
+  const line = document.createElementNS(svgNs, 'line');
+  line.setAttribute('x1', lr.right - svgRect.left);
+  line.setAttribute('y1', lr.top + lr.height / 2 - svgRect.top);
+  line.setAttribute('x2', rr.left - svgRect.left);
+  line.setAttribute('y2', rr.top + rr.height / 2 - svgRect.top);
+  line.style.stroke = strokeColor;
+  line.style.strokeWidth = '3';
+  line.style.strokeLinecap = 'round';
+  svg.appendChild(line);
+  return line;
+}
+
 function matchPick(side, btn) {
-  if (btn.disabled) return;
+  if (answered || btn.disabled) return;
   if (side === 'left') {
     if (matchSelLeft) matchSelLeft.classList.remove('picked');
     matchSelLeft = btn; btn.classList.add('picked');
@@ -692,24 +760,44 @@ function matchPick(side, btn) {
     leftEl.classList.add('matched'); rightEl.classList.add('matched');
     leftEl.disabled = true; rightEl.disabled = true;
     recordAnswer(item, true); playSound('correct'); correctCount++;
+    drawMatchLine(leftEl, rightEl, 'var(--green)');
     matchRemaining = matchRemaining.filter(i => i !== leftIdx);
     updateQuizProgress();
+    matchSelLeft = null; matchSelRight = null;
+    if (matchRemaining.length === 0) setTimeout(advanceQueue, 500);
   } else {
+    // Pause on a wrong pick — reveal the correct meaning and wait for an
+    // explicit "Continue" tap (same feedback-bar pattern as every other
+    // question type), instead of auto-fading before it can be read.
+    answered = true;
     leftEl.classList.add('wrong'); rightEl.classList.add('wrong');
     leftEl.disabled = true; rightEl.disabled = true;
     recordAnswer(item, false); playSound('wrong');
+    const wrongLine = drawMatchLine(leftEl, rightEl, 'var(--red)');
+    const correctRight = document.querySelector(`#matchRight .match-btn[data-idx="${leftIdx}"]`);
+    let correctLine = null;
+    if (correctRight) { correctRight.classList.add('reveal-correct'); correctLine = drawMatchLine(leftEl, correctRight, 'var(--green)'); }
     quizQuestions.push(makeQuestion(item, quizPool));
     matchRemaining = matchRemaining.filter(i => i !== leftIdx);
-    const orphanRight = document.querySelector(`#matchRight .match-btn[data-idx="${leftIdx}"]`);
-    if (orphanRight) orphanRight.disabled = true;
-    setTimeout(() => {
-      leftEl.classList.add('gone');
-      if (orphanRight) orphanRight.classList.add('gone');
-      rightEl.classList.remove('wrong', 'picked'); rightEl.disabled = false;
-    }, 500);
+    matchPendingWrong = { leftEl, rightEl, correctRight, wrongLine, correctLine };
+    matchSelLeft = null; matchSelRight = null;
+    showFeedback(false, item.meaning, { item });
   }
-  matchSelLeft = null; matchSelRight = null;
-  if (matchRemaining.length === 0) setTimeout(advanceQueue, 500);
+}
+
+function resumeMatchRound() {
+  hideFeedback();
+  if (matchPendingWrong) {
+    const { leftEl, rightEl, correctRight, wrongLine, correctLine } = matchPendingWrong;
+    leftEl.classList.add('gone');
+    if (correctRight) correctRight.classList.add('gone');
+    rightEl.classList.remove('wrong', 'picked'); rightEl.disabled = false;
+    if (wrongLine) wrongLine.remove();
+    if (correctLine) correctLine.remove();
+    matchPendingWrong = null;
+  }
+  answered = false;
+  if (matchRemaining.length === 0) advanceQueue();
 }
 
 function esc(s) { return s.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
@@ -748,7 +836,11 @@ function showFeedback(ok, correct, q) {
 
 function hideFeedback() { document.getElementById('feedbackBar').className = 'feedback-bar'; }
 
-function nextQuestion() { advanceQueue(); }
+function nextQuestion() {
+  const q = quizQuestions[currentQIndex];
+  if (q && q.kind === 'match') { resumeMatchRound(); return; }
+  advanceQueue();
+}
 
 function showResult() {
   hideFeedback();
