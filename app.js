@@ -307,7 +307,13 @@ const PHOTO_CREDITS = [
   ['Bass drum', 'Žiga', 'CC0', 'https://commons.wikimedia.org/wiki/File:Gran_cassa.jpg'],
   ['Triangle', 'Philip.t.day', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Triangle_001.jpg'],
   ['Cymbals', 'Andrewa', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Clash_cymbals.jpg'],
-  ['Tambourine', 'GigNroll.com', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:Hand_tambourine_(by_GigNroll.com).jpg'],
+  ['Tambourine', 'muzyczny.pl / Sp5uhe', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Instrument_perkusyjny_pandeiro_PA10ABS-BK-NH_firmy_Meinl.jpg'],
+  ['Marimba', 'Marimbaone', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Marimba_One_4000_Series.jpg'],
+  ['Vibraphone', 'Cliff (Flickr)', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:RCAStudioB_Vibraphone_1.jpg'],
+  ['Celesta', 'Fredamas', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:C%C3%A9lesta_-_F%C3%A9n%C3%A9trange_-_20-09-2009.jpg'],
+  ['Tubular bells', 'Xylosmygame', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Yamaha_Deagan_chimes_(from_LA_Percussion_Rentals).jpg'],
+  ['Castanets', 'Bemoeial', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Castanets.jpg'],
+  ['Tam-tam (gong)', '"っ" (ja.wikipedia)', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Tam-tam001.jpg'],
 ];
 
 function renderTopics() {

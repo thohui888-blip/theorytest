@@ -109,6 +109,32 @@ const ICONS = {
     <circle cx="114" cy="66" r="8" fill="${INK}"/>
   </svg>` },
 
+  // ── Piano / String Technique symbols ──
+  arpeggio: { type: 'svg', svg: `<svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="90" rx="13" ry="9" fill="${INK}"/>
+    <ellipse cx="100" cy="65" rx="13" ry="9" fill="${INK}"/>
+    <ellipse cx="100" cy="40" rx="13" ry="9" fill="${INK}"/>
+    <line x1="113" y1="90" x2="113" y2="15" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M72 98 Q60 87 72 76 Q84 65 72 54 Q60 43 72 32" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
+    <path d="M64 39 L72 30 L80 39" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>` },
+  pedal: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <text x="10" y="58" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="34" fill="${INK}">Ped.</text>
+    <path d="M92 68 L142 68 L142 44" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>` },
+  bow_slur: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="38" cy="72" rx="9" ry="7" fill="${INK}"/><line x1="47" y1="72" x2="47" y2="35" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>
+    <ellipse cx="80" cy="66" rx="9" ry="7" fill="${INK}"/><line x1="89" y1="66" x2="89" y2="29" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>
+    <ellipse cx="122" cy="60" rx="9" ry="7" fill="${INK}"/><line x1="131" y1="60" x2="131" y2="23" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M33 20 Q80 3 127 13" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
+  </svg>` },
+  down_bow: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M50 78 L50 28 L110 28 L110 78" fill="none" stroke="${INK}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>` },
+  up_bow: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M48 26 L80 78 L112 26" fill="none" stroke="${INK}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>` },
+
   // ── Dynamics: typeset as styled marks, not drawn images ──
   ppp: { type: 'text', text: 'ppp' }, fff: { type: 'text', text: 'fff' },
   pp: { type: 'text', text: 'pp' }, p_dyn: { type: 'text', text: 'p' },

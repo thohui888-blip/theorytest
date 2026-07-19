@@ -175,10 +175,6 @@ const TOPICS = [
       {type:'normal', term:'tosto', meaning:'Swift, rapid'},
       {type:'normal', term:'volante', meaning:'Flying, fast'},
       {type:'normal', term:'rf, rfz rinforzando (rinf.)', meaning:'Reinforcing'},
-      {type:'normal', term:'una corda', meaning:'Press the left (soft) pedal'},
-      {type:'normal', term:'tre corde', meaning:'Release the left pedal'},
-      {type:'normal', term:'mano sinistra (m.s.)', meaning:'Left hand'},
-      {type:'normal', term:'mano destra (m.d.)', meaning:'Right hand'},
       // French
       {type:'normal', term:'à', meaning:'To, at'},
       {type:'normal', term:'assez', meaning:'Enough'},
@@ -208,48 +204,52 @@ const INSTRUMENT_TOPICS = [
   {
     id:'strings', name:'Strings', icon:'🎻', color:'#ff6b9d',
     items:[
-      {type:'normal', term:'Violin', meaning:'String family, played with a bow. Treble clef.', photo:'images/violin.png'},
-      {type:'normal', term:'Viola', meaning:'String family, played with a bow. Alto clef.', photo:'images/viola.jpg'},
-      {type:'normal', term:'Cello', meaning:'String family, played with a bow. Bass clef (also alto/treble for high passages).', photo:'images/cello.jpg'},
-      {type:'normal', term:'Double bass', meaning:'String family, played with a bow. Bass clef. Sounds an octave lower than written.', photo:'images/double_bass.jpg'},
-      {type:'normal', term:'Harp', meaning:'String family, plucked rather than bowed.', photo:'images/harp.jpg'},
+      {type:'normal', term:'Violin', meaning:'String family, played with a bow (or plucked — pizzicato). Can play more than one note at a time. With mutes (con sordino). Treble clef.', photo:'images/violin.png'},
+      {type:'normal', term:'Viola', meaning:'String family, played with a bow (or plucked — pizzicato). Can play more than one note at a time. With mutes (con sordino). Alto clef.', photo:'images/viola.jpg'},
+      {type:'normal', term:'Cello', meaning:'String family, played with a bow (or plucked — pizzicato). Can play more than one note at a time. With mutes (con sordino). Bass clef, also Tenor clef for higher passages.', photo:'images/cello.jpg'},
+      {type:'normal', term:'Double bass', meaning:'String family, played with a bow (or plucked — pizzicato). Can play more than one note at a time. With mutes (con sordino). Bass clef. Transposing (sounds an octave lower than written).', photo:'images/double_bass.jpg'},
+      {type:'normal', term:'Harp', meaning:'String family, plucked rather than bowed. Can play more than one note at a time. With mutes (con sordino). Treble clef and Bass clef.', photo:'images/harp.jpg'},
     ]
   },
   {
     id:'woodwind', name:'Woodwind', icon:'🎶', color:'#1cb0f6',
     items:[
-      {type:'normal', term:'Flute', meaning:'Woodwind family, no reed. Treble clef.', photo:'images/flute.jpg'},
-      {type:'normal', term:'Piccolo', meaning:'Woodwind family, no reed (a smaller, higher-pitched flute). Treble clef. Sounds an octave higher than written.', photo:'images/piccolo.jpg'},
-      {type:'normal', term:'Oboe', meaning:'Woodwind family, double reed. Treble clef.', photo:'images/oboe.jpg'},
-      {type:'normal', term:'Cor anglais', meaning:'Woodwind family, double reed (a lower-pitched oboe). Treble clef.', photo:'images/cor_anglais.jpg'},
-      {type:'normal', term:'Clarinet', meaning:'Woodwind family, single reed. Treble clef. A transposing instrument.', photo:'images/clarinet.jpg'},
-      {type:'normal', term:'Bass clarinet', meaning:'Woodwind family, single reed. Lower-pitched than the clarinet.', photo:'images/bass_clarinet.jpg'},
-      {type:'normal', term:'Bassoon', meaning:'Woodwind family, double reed. Bass clef (also alto/treble for high passages).', photo:'images/bassoon.jpg'},
-      {type:'normal', term:'Double bassoon', meaning:'Woodwind family, double reed. Sounds an octave lower than the bassoon.', photo:'images/double_bassoon.jpg'},
-      {type:'normal', term:'Saxophone', meaning:'Woodwind family, single reed. Not part of the standard orchestra.', photo:'images/saxophone.jpg'},
+      {type:'normal', term:'Flute', meaning:'Woodwind family, no reed. Plays only one note at a time. Treble clef.', photo:'images/flute.jpg'},
+      {type:'normal', term:'Piccolo', meaning:'Woodwind family, no reed (a smaller, higher-pitched flute). Plays only one note at a time. Transposing (sounds an octave higher than written). Treble clef.', photo:'images/piccolo.jpg'},
+      {type:'normal', term:'Oboe', meaning:'Woodwind family, double reed. Plays only one note at a time. Treble clef.', photo:'images/oboe.jpg'},
+      {type:'normal', term:'Cor anglais', meaning:'Woodwind family, double reed (a lower-pitched oboe). Plays only one note at a time. Transposing (sounds a 5th lower than written). Treble clef.', photo:'images/cor_anglais.jpg'},
+      {type:'normal', term:'Clarinet', meaning:'Woodwind family, single reed. Plays only one note at a time. Transposing (sounds a tone lower than written). Treble clef.', photo:'images/clarinet.jpg'},
+      {type:'normal', term:'Bassoon', meaning:'Woodwind family, double reed. Plays only one note at a time. Bass clef, also Tenor clef for higher passages.', photo:'images/bassoon.jpg'},
+      {type:'normal', term:'Double bassoon', meaning:'Woodwind family, double reed. Plays only one note at a time. Transposing (sounds an octave lower than the bassoon).', photo:'images/double_bassoon.jpg'},
+      {type:'normal', term:'Saxophone', meaning:'Woodwind family, single reed. Plays only one note at a time. Not part of the standard orchestra.', photo:'images/saxophone.jpg'},
     ]
   },
   {
     id:'brass', name:'Brass', icon:'🎺', color:'#ff9500',
     items:[
-      {type:'normal', term:'Trumpet (in B♭)', meaning:'Brass family. Treble clef. A transposing instrument — sounds a tone lower than written.', photo:'images/trumpet.jpg'},
-      {type:'normal', term:'Cornet', meaning:'Brass family. Treble clef. Similar to the trumpet but with a mellower tone.', photo:'images/cornet.png'},
-      {type:'normal', term:'Horn in F', meaning:'Brass family. Treble or bass clef. A transposing instrument — sounds a 5th lower than written.', photo:'images/horn.png'},
-      {type:'normal', term:'Trombone', meaning:'Brass family. Bass clef (tenor trombone also reads alto/treble clef). Uses a slide instead of valves.', photo:'images/trombone.jpg'},
-      {type:'normal', term:'Tuba', meaning:'Brass family. Bass clef. The lowest-pitched brass instrument.', photo:'images/tuba.jpg'},
+      {type:'normal', term:'Trumpet (in B♭)', meaning:'Brass family. Plays only one note at a time (can use mutes). Transposing (sounds a tone lower than written). Treble clef.', photo:'images/trumpet.jpg'},
+      {type:'normal', term:'Horn', meaning:'Brass family. Plays only one note at a time (can use mutes). Transposing (sounds a 5th lower than written). Treble or Bass clef.', photo:'images/horn.png'},
+      {type:'normal', term:'Trombone', meaning:'Brass family. Plays only one note at a time (can use mutes). Uses a slide instead of valves. Bass clef, also Tenor clef for higher passages.', photo:'images/trombone.jpg'},
+      {type:'normal', term:'Tuba', meaning:'Brass family. Plays only one note at a time (can use mutes). Bass clef. The lowest-pitched brass instrument.', photo:'images/tuba.jpg'},
     ]
   },
   {
     id:'percussion', name:'Percussion', icon:'🥁', color:'#ce82ff',
     items:[
-      {type:'normal', term:'Timpani', meaning:'Pitched percussion — tuned drums. A standard orchestra usually has 2, each tuned to a different pitch.', photo:'images/timpani.jpg'},
-      {type:'normal', term:'Xylophone', meaning:'Pitched percussion — wooden bars struck with mallets.', photo:'images/xylophone.jpg'},
-      {type:'normal', term:'Glockenspiel', meaning:'Pitched percussion — metal bars struck with mallets.', photo:'images/glockenspiel.jpg'},
-      {type:'normal', term:'Side drum', meaning:'Unpitched percussion (also called the snare drum).', photo:'images/side_drum.jpg'},
-      {type:'normal', term:'Bass drum', meaning:'Unpitched percussion — the largest orchestral drum.', photo:'images/bass_drum.jpg'},
-      {type:'normal', term:'Triangle', meaning:'Unpitched percussion — a metal triangle struck with a beater.', photo:'images/triangle.jpg'},
-      {type:'normal', term:'Cymbals', meaning:'Unpitched percussion — two metal discs clashed together.', photo:'images/cymbals.jpg'},
-      {type:'normal', term:'Tambourine', meaning:'Unpitched percussion — a frame drum with metal jingles.', photo:'images/tambourine.jpg'},
+      {type:'normal', term:'Timpani', meaning:'Definite pitch — tuned drums. A standard orchestra usually has 2, each tuned to a different pitch. Bass clef.', photo:'images/timpani.jpg'},
+      {type:'normal', term:'Xylophone', meaning:'Definite pitch — wooden bars struck with mallets. Treble clef.', photo:'images/xylophone.jpg'},
+      {type:'normal', term:'Glockenspiel', meaning:'Definite pitch — metal bars struck with mallets. Transposing (sounds higher than written). Treble clef.', photo:'images/glockenspiel.jpg'},
+      {type:'normal', term:'Side drum (Snare drum)', meaning:'Indefinite pitch.', photo:'images/side_drum.jpg'},
+      {type:'normal', term:'Bass drum', meaning:'Indefinite pitch.', photo:'images/bass_drum.jpg'},
+      {type:'normal', term:'Triangle', meaning:'Indefinite pitch.', photo:'images/triangle.jpg'},
+      {type:'normal', term:'Cymbals', meaning:'Indefinite pitch.', photo:'images/cymbals.jpg'},
+      {type:'normal', term:'Tambourine', meaning:'Indefinite pitch.', photo:'images/tambourine.jpg'},
+      {type:'normal', term:'Marimba', meaning:'Definite pitch — wooden bars struck with mallets (larger and lower-pitched than a xylophone). Bass clef and Treble clef.', photo:'images/marimba.jpg'},
+      {type:'normal', term:'Vibraphone', meaning:'Definite pitch — metal bars struck with mallets, with a motor-driven vibrato effect. Treble clef.', photo:'images/vibraphone.jpg'},
+      {type:'normal', term:'Celesta', meaning:'Definite pitch — a small keyboard instrument that strikes metal bars with hammers. Transposing (sounds higher than written). Bass clef and Treble clef.', photo:'images/celesta.jpg'},
+      {type:'normal', term:'Tubular bells', meaning:'Definite pitch — long metal tubes struck with a mallet, sounding like church bells. Treble clef.', photo:'images/tubular_bells.jpg'},
+      {type:'normal', term:'Castanets', meaning:'Indefinite pitch.', photo:'images/castanets.jpg'},
+      {type:'normal', term:'Tam-tam (gong)', meaning:'Indefinite pitch.', photo:'images/tam_tam.jpg'},
     ]
   },
   {
@@ -257,11 +257,35 @@ const INSTRUMENT_TOPICS = [
     items:[
       {type:'normal', term:'Soprano', meaning:'The highest female voice.', emoji:'🎤'},
       {type:'normal', term:'Mezzo-soprano', meaning:'Female voice between soprano and alto.', emoji:'🎤'},
-      {type:'normal', term:'Contralto (Alto)', meaning:'The lowest female voice.', emoji:'🎤'},
-      {type:'normal', term:'Counter-tenor', meaning:'The highest male voice, in the range of alto/mezzo-soprano.', emoji:'🎤'},
+      {type:'normal', term:'Alto', meaning:'The lowest female voice.', emoji:'🎤'},
       {type:'normal', term:'Tenor', meaning:'A high male voice.', emoji:'🎤'},
       {type:'normal', term:'Baritone', meaning:'Male voice between tenor and bass.', emoji:'🎤'},
       {type:'normal', term:'Bass', meaning:'The lowest male voice.', emoji:'🎤'},
+    ]
+  },
+  {
+    id:'piano', name:'Piano', icon:'🎹', color:'#22c55e',
+    items:[
+      {type:'normal', term:'mano sinistra (m.s.)', meaning:'Left hand'},
+      {type:'normal', term:'mano destra (m.d.)', meaning:'Right hand'},
+      {type:'normal', term:'Arpeggio', meaning:'Spread the chord notes rapidly upwards (like a harp).', img:'arpeggio'},
+      {type:'normal', term:'Ped.', meaning:'Press, then release, the sustain (right) pedal.', img:'pedal'},
+      {type:'normal', term:'una corda', meaning:'Press the left (soft) pedal'},
+      {type:'normal', term:'tre corde', meaning:'Release the left pedal'},
+    ]
+  },
+  {
+    id:'string_technique', name:'String Technique', icon:'🎻', color:'#f43f5e',
+    items:[
+      {type:'normal', term:'arco', meaning:'Play with the bow'},
+      {type:'normal', term:'pizzicato (pizz.)', meaning:'Pluck with the fingers'},
+      {type:'normal', term:'con sordini (con sord.)', meaning:'With mutes'},
+      {type:'normal', term:'senza sordini (senza sord.)', meaning:'Without mutes'},
+      {type:'normal', term:'sul G', meaning:'Play on the G string'},
+      {type:'normal', term:'sul D', meaning:'Play on the D string'},
+      {type:'normal', term:'Single bow stroke', meaning:'Notes under this mark are played in one bow stroke (up or down).', img:'bow_slur'},
+      {type:'normal', term:'Down bow', meaning:'Draw the bow from frog to tip.', img:'down_bow'},
+      {type:'normal', term:'Up bow', meaning:'Draw the bow from tip to frog.', img:'up_bow'},
     ]
   }
 ];
