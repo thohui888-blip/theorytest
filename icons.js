@@ -115,8 +115,7 @@ const ICONS = {
     <ellipse cx="100" cy="65" rx="13" ry="9" fill="${INK}"/>
     <ellipse cx="100" cy="40" rx="13" ry="9" fill="${INK}"/>
     <line x1="113" y1="90" x2="113" y2="15" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>
-    <path d="M72 98 Q60 87 72 76 Q84 65 72 54 Q60 43 72 32" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
-    <path d="M64 39 L72 30 L80 39" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M72 98 Q60 87 72 76 Q84 65 72 54 Q60 43 72 32 Q80 26 72 18" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
   </svg>` },
   pedal: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
     <text x="10" y="58" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="34" fill="${INK}">Ped.</text>
@@ -133,6 +132,48 @@ const ICONS = {
   </svg>` },
   up_bow: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
     <path d="M48 26 L80 78 L112 26" fill="none" stroke="${INK}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>` },
+
+  // ── Ornaments (grace note + main note, or standalone symbol above a note) ──
+  acciaccatura: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="35" cy="70" rx="8" ry="6" fill="${INK}"/>
+    <line x1="43" y1="70" x2="43" y2="25" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M43 25 Q55 30 50 42" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
+    <line x1="34" y1="20" x2="54" y2="40" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="112" cy="60" rx="12" ry="9" fill="${INK}"/>
+    <line x1="124" y1="60" x2="124" y2="15" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
+    <path d="M40 55 Q75 33 107 47" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>
+  </svg>` },
+  grace_note: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="35" cy="70" rx="8" ry="6" fill="${INK}"/>
+    <line x1="43" y1="70" x2="43" y2="25" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M43 25 Q55 30 50 42" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M43 32 Q53 36 49 46" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="112" cy="60" rx="12" ry="9" fill="${INK}"/>
+    <line x1="124" y1="60" x2="124" y2="15" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
+    <path d="M40 55 Q75 33 107 47" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>
+  </svg>` },
+  appoggiatura: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="35" cy="70" rx="8" ry="6" fill="${INK}"/>
+    <line x1="43" y1="70" x2="43" y2="25" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M43 25 Q55 30 50 42" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="112" cy="60" rx="12" ry="9" fill="${INK}"/>
+    <line x1="124" y1="60" x2="124" y2="15" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
+    <path d="M40 55 Q75 33 107 47" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>
+  </svg>` },
+  trill: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <text x="15" y="62" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="46" fill="${INK}">tr</text>
+    <path d="M78 46 Q88 36 98 46 Q108 56 118 46 Q128 36 138 46" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>
+  </svg>` },
+  upper_mordent: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M25 60 L48 30 L71 60 L94 30 L117 60 L140 30" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>` },
+  lower_mordent: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M25 60 L48 30 L71 60 L94 30 L117 60 L140 30" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="82" y1="18" x2="82" y2="72" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>
+  </svg>` },
+  turn: { type: 'svg', svg: `<svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M135 55 C135 30, 105 30, 105 45 C105 60, 75 60, 75 45 C75 30, 45 30, 45 45 C45 58, 30 60, 22 58" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>
   </svg>` },
 
   // ── Dynamics: typeset as styled marks, not drawn images ──

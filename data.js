@@ -204,33 +204,31 @@ const INSTRUMENT_TOPICS = [
   {
     id:'strings', name:'Strings', icon:'🎻', color:'#ff6b9d',
     items:[
-      {type:'normal', term:'Violin', meaning:'String family, played with a bow (or plucked — pizzicato). Can play more than one note at a time. With mutes (con sordino). Treble clef.', photo:'images/violin.png'},
-      {type:'normal', term:'Viola', meaning:'String family, played with a bow (or plucked — pizzicato). Can play more than one note at a time. With mutes (con sordino). Alto clef.', photo:'images/viola.jpg'},
-      {type:'normal', term:'Cello', meaning:'String family, played with a bow (or plucked — pizzicato). Can play more than one note at a time. With mutes (con sordino). Bass clef, also Tenor clef for higher passages.', photo:'images/cello.jpg'},
-      {type:'normal', term:'Double bass', meaning:'String family, played with a bow (or plucked — pizzicato). Can play more than one note at a time. With mutes (con sordino). Bass clef. Transposing (sounds an octave lower than written).', photo:'images/double_bass.jpg'},
-      {type:'normal', term:'Harp', meaning:'String family, plucked rather than bowed. Can play more than one note at a time. With mutes (con sordino). Treble clef and Bass clef.', photo:'images/harp.jpg'},
+      {type:'normal', term:'Violin', meaning:'Played with a bow (or plucked — pizzicato). Can play more than one note at a time. With mutes (con sordino). Treble clef.', photo:'images/violin.png'},
+      {type:'normal', term:'Viola', meaning:'Played with a bow (or plucked — pizzicato). Can play more than one note at a time. With mutes (con sordino). Alto clef.', photo:'images/viola.jpg'},
+      {type:'normal', term:'Cello', meaning:'Played with a bow (or plucked — pizzicato). Can play more than one note at a time. With mutes (con sordino). Bass clef, also Tenor clef for higher passages.', photo:'images/cello.jpg'},
+      {type:'normal', term:'Double bass', meaning:'Played with a bow (or plucked — pizzicato). Can play more than one note at a time. With mutes (con sordino). Bass clef. Transposing (sounds an octave lower than written).', photo:'images/double_bass.jpg'},
+      {type:'normal', term:'Harp', meaning:'Plucked rather than bowed. Can play more than one note at a time. With mutes (con sordino). Treble clef and Bass clef.', photo:'images/harp.jpg'},
     ]
   },
   {
     id:'woodwind', name:'Woodwind', icon:'🎶', color:'#1cb0f6',
     items:[
-      {type:'normal', term:'Flute', meaning:'Woodwind family, no reed. Plays only one note at a time. Treble clef.', photo:'images/flute.jpg'},
-      {type:'normal', term:'Piccolo', meaning:'Woodwind family, no reed (a smaller, higher-pitched flute). Plays only one note at a time. Transposing (sounds an octave higher than written). Treble clef.', photo:'images/piccolo.jpg'},
-      {type:'normal', term:'Oboe', meaning:'Woodwind family, double reed. Plays only one note at a time. Treble clef.', photo:'images/oboe.jpg'},
-      {type:'normal', term:'Cor anglais', meaning:'Woodwind family, double reed (a lower-pitched oboe). Plays only one note at a time. Transposing (sounds a 5th lower than written). Treble clef.', photo:'images/cor_anglais.jpg'},
-      {type:'normal', term:'Clarinet', meaning:'Woodwind family, single reed. Plays only one note at a time. Transposing (sounds a tone lower than written). Treble clef.', photo:'images/clarinet.jpg'},
-      {type:'normal', term:'Bassoon', meaning:'Woodwind family, double reed. Plays only one note at a time. Bass clef, also Tenor clef for higher passages.', photo:'images/bassoon.jpg'},
-      {type:'normal', term:'Double bassoon', meaning:'Woodwind family, double reed. Plays only one note at a time. Transposing (sounds an octave lower than the bassoon).', photo:'images/double_bassoon.jpg'},
-      {type:'normal', term:'Saxophone', meaning:'Woodwind family, single reed. Plays only one note at a time. Not part of the standard orchestra.', photo:'images/saxophone.jpg'},
+      {type:'normal', term:'Flute', meaning:'No reed. Plays only one note at a time. Treble clef.', photo:'images/flute.jpg'},
+      {type:'normal', term:'Piccolo', meaning:'No reed (a smaller, higher-pitched flute). Plays only one note at a time. Transposing (sounds an octave higher than written). Treble clef.', photo:'images/piccolo.jpg'},
+      {type:'normal', term:'Oboe', meaning:'Double reed. Plays only one note at a time. Treble clef.', photo:'images/oboe.jpg'},
+      {type:'normal', term:'Cor anglais', meaning:'Double reed (a lower-pitched oboe). Plays only one note at a time. Transposing (sounds a 5th lower than written). Treble clef.', photo:'images/cor_anglais.jpg'},
+      {type:'normal', term:'Clarinet', meaning:'Single reed. Plays only one note at a time. Transposing (sounds a tone lower than written). Treble clef.', photo:'images/clarinet.jpg'},
+      {type:'normal', term:'Bassoon', meaning:'Double reed. Plays only one note at a time. Bass clef, also Tenor clef for higher passages.', photo:'images/bassoon.jpg'},
     ]
   },
   {
     id:'brass', name:'Brass', icon:'🎺', color:'#ff9500',
     items:[
-      {type:'normal', term:'Trumpet (in B♭)', meaning:'Brass family. Plays only one note at a time (can use mutes). Transposing (sounds a tone lower than written). Treble clef.', photo:'images/trumpet.jpg'},
-      {type:'normal', term:'Horn', meaning:'Brass family. Plays only one note at a time (can use mutes). Transposing (sounds a 5th lower than written). Treble or Bass clef.', photo:'images/horn.png'},
-      {type:'normal', term:'Trombone', meaning:'Brass family. Plays only one note at a time (can use mutes). Uses a slide instead of valves. Bass clef, also Tenor clef for higher passages.', photo:'images/trombone.jpg'},
-      {type:'normal', term:'Tuba', meaning:'Brass family. Plays only one note at a time (can use mutes). Bass clef. The lowest-pitched brass instrument.', photo:'images/tuba.jpg'},
+      {type:'normal', term:'Trumpet (in B♭)', meaning:'Plays only one note at a time (can use mutes). Transposing (sounds a tone lower than written). Treble clef.', photo:'images/trumpet.jpg'},
+      {type:'normal', term:'Horn', meaning:'Plays only one note at a time (can use mutes). Transposing (sounds a 5th lower than written). Treble or Bass clef.', photo:'images/horn.png'},
+      {type:'normal', term:'Trombone', meaning:'Plays only one note at a time (can use mutes). Uses a slide instead of valves. Bass clef, also Tenor clef for higher passages.', photo:'images/trombone.jpg'},
+      {type:'normal', term:'Tuba', meaning:'Plays only one note at a time (can use mutes). Bass clef. The lowest-pitched brass instrument.', photo:'images/tuba.jpg'},
     ]
   },
   {
@@ -239,7 +237,7 @@ const INSTRUMENT_TOPICS = [
       {type:'normal', term:'Timpani', meaning:'Definite pitch — tuned drums. A standard orchestra usually has 2, each tuned to a different pitch. Bass clef.', photo:'images/timpani.jpg'},
       {type:'normal', term:'Xylophone', meaning:'Definite pitch — wooden bars struck with mallets. Treble clef.', photo:'images/xylophone.jpg'},
       {type:'normal', term:'Glockenspiel', meaning:'Definite pitch — metal bars struck with mallets. Transposing (sounds higher than written). Treble clef.', photo:'images/glockenspiel.jpg'},
-      {type:'normal', term:'Side drum (Snare drum)', meaning:'Indefinite pitch.', photo:'images/side_drum.jpg'},
+      {type:'normal', term:'Snare drum (Side drum)', meaning:'Indefinite pitch.', photo:'images/side_drum.jpg'},
       {type:'normal', term:'Bass drum', meaning:'Indefinite pitch.', photo:'images/bass_drum.jpg'},
       {type:'normal', term:'Triangle', meaning:'Indefinite pitch.', photo:'images/triangle.jpg'},
       {type:'normal', term:'Cymbals', meaning:'Indefinite pitch.', photo:'images/cymbals.jpg'},
@@ -272,6 +270,13 @@ const INSTRUMENT_TOPICS = [
       {type:'normal', term:'Ped.', meaning:'Press, then release, the sustain (right) pedal.', img:'pedal'},
       {type:'normal', term:'una corda', meaning:'Press the left (soft) pedal'},
       {type:'normal', term:'tre corde', meaning:'Release the left pedal'},
+      {type:'normal', term:'Acciaccatura', meaning:'Play as quickly as possible.', img:'acciaccatura'},
+      {type:'normal', term:'Grace note (Acciaccature)', meaning:'Play as quickly as possible.', img:'grace_note'},
+      {type:'normal', term:'Appoggiatura', meaning:'Lean on the main note (both notes share the beat evenly).', img:'appoggiatura'},
+      {type:'normal', term:'Trill', meaning:'Rapid alternation between the main note and the note above.', img:'trill'},
+      {type:'normal', term:'Upper mordent', meaning:'A rapid alternation with the note above the written note.', img:'upper_mordent'},
+      {type:'normal', term:'Lower mordent', meaning:'A rapid alternation with the note below the written note.', img:'lower_mordent'},
+      {type:'normal', term:'Turn', meaning:'Follow its melodic shape (a group of notes curving around the main note).', img:'turn'},
     ]
   },
   {
